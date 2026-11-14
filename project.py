@@ -3,6 +3,7 @@ from Bio import SeqIO
 import argparse
 import pathlib
 from tabulate import tabulate
+import csv
 
 def main():
     """
@@ -39,7 +40,19 @@ def read_fasta(file):
     return [DNA(str(record.seq)) for record in SeqIO.parse(file, 'fasta')]
 
 def export_reports(data, d_file):
-    ...
+    """
+        Arg:
+            data -> list of DNA objects.
+            d_file -> distenation file.
+
+        Create a csv file with each sequence information.
+    """
+    headers, table = table_data(data, eliminate=False)
+
+    with open(d_file, mode="w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(headers)
+        writer.writerows(table)
 
 def show_report(data):
     """
