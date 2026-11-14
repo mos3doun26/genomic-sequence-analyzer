@@ -2,6 +2,7 @@ from dna import DNA
 from Bio import SeqIO
 import argparse
 import pathlib
+from tabulate import tabulate
 
 def main():
     """
@@ -35,16 +36,52 @@ def read_fasta(file):
         Input: fasta file
         Ouput: list of DNA sequences
     """
-    return [str(record.seq) for record in SeqIO.parse(file, 'fasta')]
+    return [DNA(str(record.seq)) for record in SeqIO.parse(file, 'fasta')]
 
 def export_reports(data, d_file):
     ...
 
 def show_report(data):
-    ...
+    """
+        Arg:
+            data -> list of DNA objects.
+        print table in terminal
+    """
+    headers, table = table_data(data)
+    print(tabulate(table, headers, tablefmt='grid'))
+
+    if len(data) > 10:
+        print("There are other DNA sequences......")
 
 def compare(list):
     ...
+
+def table_data(data, eliminate=True):
+    """
+        Args:
+            data -> list of DNA objects
+            eliminate: default True -> splice the data into just 10 DNA objects
+        return:
+            headers, table(list of rows related to headers)
+    """
+    headers = ["Sequence ID", "Length", "GC %", "A", "T", "G", "C"]
+    table = []
+    if eliminate:
+        data = data[:10]
+
+    for i, seq in enumerate(data, start=1):
+        n = seq.nucleotides
+        table.append([
+            f"Sequence_{i}",
+            len(seq.sequence),
+            seq.gc_content(),
+            n['A'],
+            n['T'],
+            n['G'],
+            n['C'],
+        ])
+
+    return headers, table
 
 if __name__ == "__main__":
     main()
