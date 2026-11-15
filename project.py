@@ -11,9 +11,9 @@ def main():
         Arugments:
             positional: Fasta file
             optional: Output CSV file
-            Flags:
-                -s, --show: show summary of report in terminal.
-                -o, --output: CSV destination file.
+        Flags:
+            -s, --show: show summary of report in terminal.
+            -o, --output: CSV destination file.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("input", type=pathlib.Path, help="Fasta file to analyze")
@@ -21,12 +21,21 @@ def main():
     parser.add_argument("-s", "--show", action="store_true", help="show summary of report in terminal window.")
 
     args = parser.parse_args()
-    sequences = read_fasta(args.input)
+    
+    if not args.input.is_file():
+        parser.error("File is not exist")
+
+    if args.input.suffix.lower() not in [".fasta", ".fa", ".fna"]:
+        parser.error("Invalid input format, use fasta file (fasta, fa, fna)")
 
     if not args.output:
         args.show = True
 
+    sequences = read_fasta(args.input)
+
     if args.output:
+        if args.output.suffix.lower() != ".csv":
+            parser.error('Invalid output format, use CSV file.')
         export_reports(sequences, args.output)
 
     if args.show:
